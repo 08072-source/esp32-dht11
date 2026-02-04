@@ -7,14 +7,26 @@
 
 <style>
 body{
-  font-family: Arial;
-  background: #111;
-  color: white;
-  text-align: center;
+  margin:0;
+  background:#111;
+  color:white;
+  font-family:Arial;
 }
+
+h1{
+  text-align:center;
+  padding:10px;
+}
+
+/* ทำให้กราฟเต็มจอ */
+#chart-container{
+  width:100vw;
+  height:90vh;
+}
+
 canvas{
-  max-width: 900px;
-  margin:auto;
+  width:100% !important;
+  height:100% !important;
 }
 </style>
 
@@ -24,11 +36,15 @@ canvas{
 
 <h1>ESP32 Sensor Monitor</h1>
 
-<canvas id="chart"></canvas>
+<div id="chart-container">
+  <canvas id="chart"></canvas>
+</div>
 
 <script>
 
 const csvUrl = "https://docs.google.com/spreadsheets/d/1is4HVAGQwXNXCZynw3pWGqbM8o_pfZOqkvZQCEfBc_I/export?format=csv&gid=0";
+
+let chart;
 
 async function loadData(){
 
@@ -56,24 +72,30 @@ async function loadData(){
 
 function drawChart(time,temp,hum){
 
-new Chart(document.getElementById("chart"),{
-  type:"line",
-  data:{
-    labels:time,
-    datasets:[
-      {
-        label:"Temperature °C",
-        data:temp,
-        borderWidth:2
-      },
-      {
-        label:"Humidity %",
-        data:hum,
-        borderWidth:2
-      }
-    ]
-  }
-});
+  if(chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("chart"),{
+    type:"line",
+    data:{
+      labels:time,
+      datasets:[
+        {
+          label:"Temperature °C",
+          data:temp,
+          borderWidth:2
+        },
+        {
+          label:"Humidity %",
+          data:hum,
+          borderWidth:2
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
+    }
+  });
 
 }
 
