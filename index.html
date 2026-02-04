@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ESP32 Monitor</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+}
+canvas{
+  max-width: 900px;
+  margin:auto;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>ESP32 Sensor Monitor</h1>
+
+<canvas id="chart"></canvas>
+
+<script>
+
+const csvUrl = "https://docs.google.com/spreadsheets/d/1is4HVAGQwXNXCZynw3pWGqbM8o_pfZOqkvZQCEfBc_I/export?format=csv&gid=0";
+
+async function loadData(){
+
+  const res = await fetch(csvUrl);
+  const text = await res.text();
+
+  const rows = text.split("\n").slice(1);
+
+  let time = [];
+  let temp = [];
+  let hum = [];
+
+  rows.forEach(r=>{
+    let col = r.split(",");
+
+    if(col[0] && col[1] && col[2]){
+      time.push(col[0]);
+      temp.push(col[1]);
+      hum.push(col[2]);
+    }
+  });
+
+  drawChart(time,temp,hum);
+}
+
+function drawChart(time,temp,hum){
+
+new Chart(document.getElementById("chart"),{
+  type:"line",
+  data:{
+    labels:time,
+    datasets:[
+      {
+        label:"Temperature °C",
+        data:temp,
+        borderWidth:2
+      },
+      {
+        label:"Humidity %",
+        data:hum,
+        borderWidth:2
+      }
+    ]
+  }
+});
+
+}
+
+loadData();
+setInterval(loadData,60000);
+
+</script>
+
+</body>
+</html>
